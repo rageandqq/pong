@@ -3,19 +3,24 @@ game states: pregame, game
 ]]
 
 function love.load()
+	radius =10
+	moveX = 5
+	moveY = 5
 	love.graphics.setNewFont (18)
 	love.graphics.setColor (255,255,255)
 	love.graphics.setBackgroundColor (45,18,224)
 	paddleWidth = 20
 	paddleHeight = 100
-	player1X = 0 
+	player1X = 0
 	player1Y = 0
-	player2X = love.window.getWidth()-paddleWidth 
+	player2X = love.window.getWidth()-paddleWidth
 	player2Y = love.window.getHeight()-paddleHeight-1
 	ballX = love.window.getWidth()/2
 	ballY = love.window.getHeight()/2
-	ballXDir = -1
-	ballyDir = -1	
+	z = math.random (1,2)
+	ballXDir = (z==1) or false
+	z = math.random (1,2)
+	ballyDir = (z==1) or false
 	playerSpeed = 10
 	game_state = "pregame"
 	timer = 0
@@ -24,13 +29,15 @@ function love.load()
 end
 
 function love.draw()
+	love.graphics.setNewFont (18)
 	love.graphics.rectangle ("fill", player1X, player1Y, paddleWidth, paddleHeight)
 	love.graphics.print ("player 1", player1X + paddleWidth, player1Y + paddleHeight/2)
 	love.graphics.rectangle ("fill", player2X, player2Y, paddleWidth, paddleHeight)
 	love.graphics.print ("player 2", player2X - 80, player2Y + paddleHeight/2)
 	if game_state == "game" then
-		love.graphics.circle ("fill", ballX, ballY, 10, 150)
+		love.graphics.circle ("fill", ballX, ballY, radius, 150)
 	end
+	love.graphics.setNewFont (28)
 	if countdown > 0 then
 		love.graphics.print (countdown, love.window.getWidth()/2, 20)
 	end
@@ -42,10 +49,10 @@ function love.keypressed(k)
 	end
 	if k == 'w' and player1Y -1 >= 0 then
 		player1Y = player1Y - 1
-	end	
+	end
 end
 
-function love.update (dt) 
+function love.update (dt)
 	--timer
 	timer = timer + dt
 	if countdown > 0 then
@@ -66,7 +73,7 @@ function love.update (dt)
 		if love.keyboard.isDown("w") then
 			if (player1Y - 10 >= 0) then
 				player1Y = player1Y - playerSpeed
-			else 
+			else
 				player1Y = 0
 			end
 		elseif love.keyboard.isDown ("s") then
@@ -81,7 +88,7 @@ function love.update (dt)
 		if love.keyboard.isDown("up") then
 			if (player2Y - 10 >= 0) then
 				player2Y = player2Y - playerSpeed
-			else 
+			else
 				player2Y = 0
 			end
 		elseif love.keyboard.isDown ("down") then
@@ -91,5 +98,27 @@ function love.update (dt)
 				player2Y = love.window.getHeight()-paddleHeight-1
 			end
 		end
+		
+		--ball movement
+		--move ball in direction required
+		-- true = increase, false = decrease
+		if ballXDir then
+			ballX = ballX + moveX	
+		else
+			ballX = ballX - moveX
+		end
+
+		if ballYDir then
+			ballY = ballY + moveY
+		else
+			ballY = ballY - moveY
+		end
+		--change direction if required
+		if (ballXDir and ballX >= love.window.getWidth()-radius) or (not ballXDir and ballX <= radius) then
+			ballXDir = not ballXDir
+		end
+		if (ballYDir and ballY >= love.window.getHeight()-radius) or (not ballYDir and ballY <= radius) then
+			ballYDir = not ballYDir
+end
 	end
 end
